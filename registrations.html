@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>View Registrations</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 640px; margin: 50px auto; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ddd; padding: 10px; }
+    th { background-color: #007BFF; color: white; text-align: left; }
+    caption { text-align:left; margin-bottom:10px; font-weight:bold; }
+  </style>
+</head>
+<body>
+  <h2>Registrations</h2>
+  <table>
+    <caption>All submitted entries</caption>
+    <thead>
+      <tr><th>Name</th><th>Email</th></tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+
+  <script>
+    async function loadData() {
+      try {
+        const res = await fetch("/api/registrations");
+        const data = await res.json();
+        const tbody = document.getElementById("tableBody");
+        tbody.innerHTML = "";
+        data.forEach(r => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${r.name}</td><td>${r.email}</td>`;
+          tbody.appendChild(tr);
+        });
+      } catch {
+        alert("Failed to load registrations.");
+      }
+    }
+    loadData();
+  </script>
+</body>
+</html>

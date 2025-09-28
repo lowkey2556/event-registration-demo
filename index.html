@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Event Registration</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 420px; margin: 50px auto; }
+    form { display: flex; flex-direction: column; gap: 10px; }
+    label { font-weight: bold; }
+    input { padding: 8px; border: 1px solid #ccc; border-radius: 6px; }
+    button { padding: 10px; background: #007BFF; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+    button:hover { background: #0056b3; }
+    .msg { margin-top: 12px; font-weight: bold; min-height: 1.2em; }
+    a { display:inline-block; margin-top:16px; }
+  </style>
+</head>
+<body>
+  <h2>Event Registration</h2>
+  <form id="regForm" novalidate>
+    <label for="name">Name</label>
+    <input type="text" id="name" autocomplete="name" required>
+
+    <label for="email">Email</label>
+    <input type="email" id="email" autocomplete="email" required>
+
+    <button type="submit">Register</button>
+  </form>
+  <div class="msg" id="message"></div>
+
+  <a href="/registrations.html">View Registrations</a>
+
+  <script>
+    const form = document.getElementById("regForm");
+    const msg  = document.getElementById("message");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name  = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+
+      if (!name || !email) {
+        msg.textContent = "Please fill all fields.";
+        msg.style.color = "red";
+        return;
+      }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        msg.textContent = "Please enter a valid email.";
+        msg.style.color = "red";
+        return;
+      }
+
+      try {
+        const res = await fetch("/api/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email })
+        });
+        const data = await res.json();
+        msg.textContent = data.message || "Something happened.";
+        msg.style.color = data.success ? "green" : "red";
+        if (data.success) form.reset();
+      } catch (err) {
+        msg.textContent = "Network error. Please try again.";
+        msg.style.color = "red";
+      }
+    });
+  </script>
+</body>
+</html>
